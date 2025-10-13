@@ -37,10 +37,13 @@ export default function CreatePost({ setShowForm }) {
       if (newPost.title.trim() && newPost.system_prompt.trim() && newPost.user_prompt.trim()) {
         const post = {
           title: newPost.title,
-          date: new Date().toISOString().split('T')[0],
           model: newPost.model,
-          prompt_content: newPost.prompt_content,
-          image_files: selectedPngFiles
+          api_key: newPost.api_key,
+          image_files: newPost.image_files,
+          table_data: newPost.table_data,
+          system_prompt: newPost.system_prompt,
+          user_prompt: newPost.user_prompt,
+          createdAt: new Date().toISOString().split('T')[0],
         };
         SubmitPost(post);
 
@@ -68,8 +71,6 @@ export default function CreatePost({ setShowForm }) {
             <div className="post-form">
               <h2>Prompt 작성</h2>
               <form onSubmit={handleSubmit}>
-
-
                 <TextInput postObj={newPost} handleInputChange={handleInputChange} title="제목" id="title" name="title" placeholder="제목" required={true} />
                 <TextInput postObj={newPost} handleInputChange={handleInputChange} title="작성자" id="author" name="author" placeholder="작성자" required={false} />
                 <BoarderLine />
