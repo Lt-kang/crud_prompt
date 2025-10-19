@@ -1,0 +1,1 @@
+# DB schema 정의(optional)

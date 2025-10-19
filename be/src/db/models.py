@@ -1,0 +1,1 @@
+# SQLAlchemy ORM model (Table 정의)

@@ -7,17 +7,36 @@ from router import (
     submit
 )
 
+
 import os
-import yaml
-from pathlib import Path
-with open(Path(__file__).parent / "config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+from dotenv import load_dotenv
+load_dotenv()
+DEV = os.getenv("DEV") == "True"
 
-SAVE_DIR = Path(config["SAVE_DIR"])
-os.makedirs(SAVE_DIR, exist_ok=True)
+'''
+logging
+'''
+if DEV:
+    print("======================================")
+    print("===============DEV_MODE===============")
+    print("==============NO LOGGING==============")
+    print("======================================")
 
-UPSTAGE_SAVE_DIR = Path(config["UPSTAGE_SAVE_DIR"])
-os.makedirs(UPSTAGE_SAVE_DIR, exist_ok=True)
+else:
+    import logging
+    import datetime
+
+    logging.basicConfig(
+        level=logging.INFO,    
+        format="%(asctime)s [%(levelname)s] %(message)s",  # 로그 포맷
+        datefmt="%Y-%m-%d %H:%M:%S",                 # 시간 포맷
+        handlers=[
+            logging.FileHandler(f"slack-bot_server_{datetime.now().strftime('%Y-%m-%d')}.log", encoding='utf-8'),  # 파일로 저장
+        ]
+    )
+    logger = logging.getLogger(__name__)
+
+
 
 
 
@@ -57,5 +76,9 @@ async def health_check():
 
 
 if __name__ == "__main__":
-    uvicorn.run('run_api:app', host="localhost", port=8020, reload=True)
+    if DEV:
+        uvicorn.run('run_api:app', host="localhost", port=8020, reload=True)
+    else:
+        uvicorn.run('run_api:app', host="localhost", port=8020)
+
 

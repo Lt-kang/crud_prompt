@@ -23,36 +23,6 @@ router = APIRouter()
 
 
 
-def api_call_action(img_path, model, prompt, _ocr=False):
-    '''
-    1. upstage ocr results check
-    1-A. 있으면 가져온 뒤 img/json을 save
-    1-B. 없으면 api call
-    2. gpt api call
-    3. 결과 저장
-    '''
-
-    if _ocr:
-        ocr_input_path = img_path
-        ocr_save_path = UPSTAGE_SAVE_DIR / f"{img_path.stem}.json"
-
-        results_json = upstage_call(ocr_input_path, ocr_save_path)
-
-        if results_json is False:
-            return "upstage api call failed"
-    
-    _prompt = prompt + "\n\n" + str(results_json)
-
-    if "gpt" in model.lower():
-        llm_result = gpt_call(model, _prompt, img_path)
-
-    elif "gemini" in model.lower():
-        llm_result = gemini_call(model, _prompt, img_path)
-
-    else:
-        return "model not found"
-    
-    return llm_result
 
 
 @router.post("/submit", response_class=JSONResponse)
