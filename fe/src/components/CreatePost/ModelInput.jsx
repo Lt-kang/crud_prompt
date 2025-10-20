@@ -31,7 +31,6 @@ export default function ModelInput({ postObj, handleInputChange }) {
   const [modelList, setModelList] = useState(modelOptions[company]);
   const [model, setModel] = useState(modelList[0]);
 
-
   const handleCompanyChange = (e) => {
     const value = e.target.value;
 

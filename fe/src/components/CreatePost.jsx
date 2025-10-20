@@ -1,13 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useContext } from 'react';
-import { API_URL } from '../App';
+
 
 import { TextInput, TextareaInput } from './CreatePost/TextInput';
 import ModelInput from './CreatePost/ModelInput';
 import ImageInput from './CreatePost/ImageInput';
 import TableDataInput from './CreatePost/TableDataInput';
 
+import { SubmitPost } from '../api/posts';
 
+
+// TODO: model_name이 정상적으로 useState update되지 않음.
 
 
 export default function CreatePost({ setShowForm }) {
@@ -17,35 +20,50 @@ export default function CreatePost({ setShowForm }) {
       title: '',
       author: '',
 
-      model: '',
+      model: 'gpt-4o',
       api_key: '',
 
-      image_files: [],
-      table_data: '',
+      image_file: null,
+      table_data: null,
       
       system_prompt: '',
       user_prompt: '',
-      createdAt: ''
     });
 
     
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      console.log(e);
-      
+
+      const post_data = {
+        title: newPost.title,
+        author: newPost.author
+      }
+
+      const model_info = {
+        model_name: newPost.model,
+        user_prompt: newPost.user_prompt,
+        system_prompt: newPost.system_prompt,
+        api_key: newPost.api_key
+      }
+
+      const formData = new FormData();
+      formData.append('post_create_form', JSON.stringify({
+        "post_data": post_data,
+        "model_info": model_info
+      }));
+
+      if (newPost.image_file) {
+        formData.append('image_file', newPost.image_file);
+      }
+      if (newPost.table_data) {
+        formData.append('table_file', newPost.table_data);
+      }
+
+      // console.log(formData);
+
       if (newPost.title.trim() && newPost.system_prompt.trim() && newPost.user_prompt.trim()) {
-        const post = {
-          title: newPost.title,
-          model: newPost.model,
-          api_key: newPost.api_key,
-          image_files: newPost.image_files,
-          table_data: newPost.table_data,
-          system_prompt: newPost.system_prompt,
-          user_prompt: newPost.user_prompt,
-          createdAt: new Date().toISOString().split('T')[0],
-        };
-        SubmitPost(post);
+        SubmitPost(formData);
 
         navigate("/")
         setShowForm(false);
@@ -80,10 +98,14 @@ export default function CreatePost({ setShowForm }) {
                 <BoarderLine />
 
                 <ImageInput postObj={newPost} />
-                <BoarderLine />
+                {/* <BoarderLine /> */}
 
                 <TableDataInput postObj={newPost} />
                 <BoarderLine />
+
+                {/* 
+                pdf data input
+                */} 
 
                 <TextareaInput postObj={newPost} handleInputChange={handleInputChange} title="System Prompt" id="system-prompt" name="system_prompt" placeholder="" rows={10} required={true} />
                 <TextareaInput postObj={newPost} handleInputChange={handleInputChange} title="User Prompt" id="user-prompt" name="user_prompt" placeholder="Hello, World!" required={true} />

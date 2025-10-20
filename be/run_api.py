@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from router import (
-    posts,
-    upload,
     submit
 )
 
@@ -16,34 +14,12 @@ DEV = os.getenv("DEV") == "True"
 '''
 logging
 '''
-if DEV:
-    print("======================================")
-    print("===============DEV_MODE===============")
-    print("==============NO LOGGING==============")
-    print("======================================")
-
-else:
-    import logging
-    import datetime
-
-    logging.basicConfig(
-        level=logging.INFO,    
-        format="%(asctime)s [%(levelname)s] %(message)s",  # 로그 포맷
-        datefmt="%Y-%m-%d %H:%M:%S",                 # 시간 포맷
-        handlers=[
-            logging.FileHandler(f"slack-bot_server_{datetime.now().strftime('%Y-%m-%d')}.log", encoding='utf-8'),  # 파일로 저장
-        ]
-    )
-    logger = logging.getLogger(__name__)
-
-
-
 
 
 app = FastAPI()
 
-app.include_router(posts.router, prefix="/api/v1")
-app.include_router(upload.router, prefix="/api/v1")
+# app.include_router(posts.router, prefix="/api/v1")
+# app.include_router(upload.router, prefix="/api/v1")
 app.include_router(submit.router, prefix="/api/v1")
 
 
@@ -78,6 +54,27 @@ async def health_check():
 if __name__ == "__main__":
     if DEV:
         uvicorn.run('run_api:app', host="localhost", port=8020, reload=True)
+
+        if DEV:
+            print("======================================")
+            print("===============DEV_MODE===============")
+            print("==============NO LOGGING==============")
+            print("======================================")
+
+            import logging
+            import datetime
+
+            logging.basicConfig(
+                level=logging.INFO,    
+                format="%(asctime)s [%(levelname)s] %(message)s",  # 로그 포맷
+                datefmt="%Y-%m-%d %H:%M:%S",                 # 시간 포맷
+                handlers=[
+                    logging.FileHandler(f"slack-bot_server_{datetime.now().strftime('%Y-%m-%d')}.log", encoding='utf-8'),  # 파일로 저장
+                ]
+            )
+            logger = logging.getLogger(__name__)
+
+
     else:
         uvicorn.run('run_api:app', host="localhost", port=8020)
 
